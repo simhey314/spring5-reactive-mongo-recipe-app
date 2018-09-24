@@ -23,7 +23,7 @@ public class CategoryReactiveRepositoryIT {
 	public static final String DESCRIPTION = "description";
 	public static final String OTHER_DESCRIPTION = "other description";
 	@Autowired
-	CategoryReactivRepository underTest;
+	CategoryReactiveRepository underTest;
 
 	@Before
 	public void setUp() throws Exception {

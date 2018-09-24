@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RecipeReactiveRepositoryIT {
 
 	@Autowired
-	RecipeReactivRepository underTest;
+	RecipeReactiveRepository underTest;
 
 	@Before
 	public void setUp() throws Exception {
