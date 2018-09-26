@@ -1,6 +1,7 @@
 package guru.springframework.controllers;
 
 import guru.springframework.commands.IngredientCommand;
+import guru.springframework.commands.RecipeCommand;
 import guru.springframework.commands.UnitOfMeasureCommand;
 import guru.springframework.services.IngredientService;
 import guru.springframework.services.RecipeService;
@@ -10,11 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by jt on 6/28/17.
@@ -26,6 +23,7 @@ public class IngredientController {
     private final IngredientService ingredientService;
     private final RecipeService recipeService;
     private final UnitOfMeasureService unitOfMeasureService;
+
     private WebDataBinder webDataBinder;
 
     public IngredientController(IngredientService ingredientService, RecipeService recipeService, UnitOfMeasureService unitOfMeasureService) {
@@ -34,9 +32,8 @@ public class IngredientController {
         this.unitOfMeasureService = unitOfMeasureService;
     }
 
-	@InitBinder("ingredient")
-    public void initBinder(WebDataBinder webDataBinder) {
-
+    @InitBinder("ingredient")
+    public void initBinder(WebDataBinder webDataBinder){
         this.webDataBinder = webDataBinder;
     }
 
@@ -60,6 +57,10 @@ public class IngredientController {
     @GetMapping("recipe/{recipeId}/ingredient/new")
     public String newRecipe(@PathVariable String recipeId, Model model){
 
+        //make sure we have a good id value
+        RecipeCommand recipeCommand = recipeService.findCommandById(recipeId).block();
+        //todo raise exception if null
+
         //need to return back parent id for hidden form property
         IngredientCommand ingredientCommand = new IngredientCommand();
         model.addAttribute("ingredient", ingredientCommand);
@@ -82,12 +83,19 @@ public class IngredientController {
     }
 
     @PostMapping("recipe/{recipeId}/ingredient")
-    public String saveOrUpdate(@ModelAttribute("ingredient") IngredientCommand command) {
+    public String saveOrUpdate(@ModelAttribute("ingredient") IngredientCommand command,
+                               Model model){
+
         webDataBinder.validate();
         BindingResult bindingResult = webDataBinder.getBindingResult();
 
-        if (bindingResult.hasErrors()) {
-            bindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+        if(bindingResult.hasErrors()){
+
+            bindingResult.getAllErrors().forEach(objectError -> {
+                log.debug(objectError.toString());
+            });
+
+            model.addAttribute("uomList", unitOfMeasureService.listAllUoms());
             return "recipe/ingredient/ingredientform";
         }
 
