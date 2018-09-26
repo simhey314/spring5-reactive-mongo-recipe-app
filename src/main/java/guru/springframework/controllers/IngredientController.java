@@ -34,7 +34,7 @@ public class IngredientController {
         this.unitOfMeasureService = unitOfMeasureService;
     }
 
-    @InitBinder
+	@InitBinder("ingredient")
     public void initBinder(WebDataBinder webDataBinder) {
 
         this.webDataBinder = webDataBinder;
@@ -82,7 +82,7 @@ public class IngredientController {
     }
 
     @PostMapping("recipe/{recipeId}/ingredient")
-    public String saveOrUpdate(@ModelAttribute IngredientCommand command){
+    public String saveOrUpdate(@ModelAttribute("ingredient") IngredientCommand command) {
         webDataBinder.validate();
         BindingResult bindingResult = webDataBinder.getBindingResult();
 
